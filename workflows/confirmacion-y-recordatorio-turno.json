@@ -1,0 +1,120 @@
+{
+  "name": "Confirmacion y recordatorio de turno - Don Mario",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nuevo-turno-donmario",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "2b2222b2-0001-4b22-b222-000000000001",
+      "name": "Nuevo turno (Webhook)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 220],
+      "webhookId": "nuevo-turno-donmario",
+      "notes": "Se dispara desde el sistema de turnos (o una planilla de Sheets) cuando se agenda una reserva nueva. Espera JSON: { nombre, telefono, fecha, hora, personas }"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "REPLACE_ME_PHONE_NUMBER_ID",
+        "recipientPhoneNumber": "={{$json.telefono}}",
+        "textBody": "¡Hola {{$json.nombre}}! Confirmamos tu reserva en Pizzería Don Mario 🍕\n\n📅 {{$json.fecha}} a las {{$json.hora}}\n👥 {{$json.personas}} personas\n\nSi necesitás cambiar el horario, respondé este mensaje. ¡Te esperamos!"
+      },
+      "id": "2b2222b2-0002-4b22-b222-000000000002",
+      "name": "Enviar confirmacion",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [480, 220],
+      "credentials": {
+        "whatsAppApi": {
+          "id": "REPLACE_ME",
+          "name": "WhatsApp Business Cloud - Don Mario"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "hours", "hoursInterval": 1 }]
+        }
+      },
+      "id": "2b2222b2-0003-4b22-b222-000000000003",
+      "name": "Chequeo cada hora",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 460],
+      "notes": "Corre cada hora y busca reservas cuya fecha/hora esté a 24hs de distancia para mandar el recordatorio."
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": { "mode": "id", "value": "REPLACE_ME_GOOGLE_SHEET_ID" },
+        "sheetName": { "mode": "name", "value": "Reservas" },
+        "options": {}
+      },
+      "id": "2b2222b2-0004-4b22-b222-000000000004",
+      "name": "Leer reservas (Sheets)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [460, 460],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_ME",
+          "name": "Google Sheets - Don Mario"
+        }
+      },
+      "notes": "Reemplazar por la fuente real de reservas (Sheets, Supabase, etc). Debe traer nombre, telefono, fecha y hora de cada reserva."
+    },
+    {
+      "parameters": {
+        "jsCode": "const ahora = new Date();\nconst en24hs = new Date(ahora.getTime() + 24*60*60*1000);\nreturn items.filter(item => {\n  const fechaTurno = new Date(item.json.fecha + 'T' + item.json.hora);\n  const diffMin = Math.abs(fechaTurno.getTime() - en24hs.getTime()) / 60000;\n  return diffMin <= 30 && !item.json.recordatorioEnviado;\n});"
+      },
+      "id": "2b2222b2-0005-4b22-b222-000000000005",
+      "name": "Filtrar reservas a 24hs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 460]
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "REPLACE_ME_PHONE_NUMBER_ID",
+        "recipientPhoneNumber": "={{$json.telefono}}",
+        "textBody": "¡Hola {{$json.nombre}}! Te recordamos tu reserva mañana {{$json.fecha}} a las {{$json.hora}} en Pizzería Don Mario 🍕\n\nSi no podés venir, respondé este mensaje para cancelar o reprogramar. ¡Te esperamos!"
+      },
+      "id": "2b2222b2-0006-4b22-b222-000000000006",
+      "name": "Enviar recordatorio",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [900, 460],
+      "credentials": {
+        "whatsAppApi": {
+          "id": "REPLACE_ME",
+          "name": "WhatsApp Business Cloud - Don Mario"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Nuevo turno (Webhook)": {
+      "main": [[{ "node": "Enviar confirmacion", "type": "main", "index": 0 }]]
+    },
+    "Chequeo cada hora": {
+      "main": [[{ "node": "Leer reservas (Sheets)", "type": "main", "index": 0 }]]
+    },
+    "Leer reservas (Sheets)": {
+      "main": [[{ "node": "Filtrar reservas a 24hs", "type": "main", "index": 0 }]]
+    },
+    "Filtrar reservas a 24hs": {
+      "main": [[{ "node": "Enviar recordatorio", "type": "main", "index": 0 }]]
+    }
+  },
+  "pinData": {},
+  "settings": { "executionOrder": "v1" },
+  "staticData": null,
+  "meta": { "templateCredsSetupCompleted": false },
+  "tags": ["whatsapp", "don-mario", "demo-io-consulting"]
+}

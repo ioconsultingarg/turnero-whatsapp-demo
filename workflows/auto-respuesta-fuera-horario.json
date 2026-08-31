@@ -1,0 +1,110 @@
+{
+  "name": "Auto-respuesta fuera de horario - Don Mario",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": ["messages"]
+      },
+      "id": "1a1111a1-0001-4a11-a111-000000000001",
+      "name": "WhatsApp Trigger",
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "whatsapp-donmario-inbound",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "REPLACE_ME",
+          "name": "WhatsApp Business Cloud - Don Mario"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const ahoraAR = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' }));\nconst dia = ahoraAR.getDay(); // 0=domingo\nconst hora = ahoraAR.getHours();\nconst abiertoMartesADomingo = dia !== 1; // cerrado los lunes\nconst horarioAbierto = hora >= 19 && hora < 24;\nreturn [{ json: { ...$json, fueraDeHorario: !(abiertoMartesADomingo && horarioAbierto) } }];"
+      },
+      "id": "1a1111a1-0002-4a11-a111-000000000002",
+      "name": "Calcular horario",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            {
+              "id": "cond-fuera-horario",
+              "leftValue": "={{$json.fueraDeHorario}}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "true" }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "1a1111a1-0003-4a11-a111-000000000003",
+      "name": "¿Fuera de horario?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "REPLACE_ME_PHONE_NUMBER_ID",
+        "recipientPhoneNumber": "={{$json.messages[0].from}}",
+        "textBody": "¡Hola! Gracias por escribir a Pizzería Don Mario 🍕\n\nEn este momento estamos cerrados. Nuestro horario es martes a domingos de 19 a 00hs (viernes y sábados hasta la 1am).\n\nTe dejamos el menú para que vayas eligiendo: https://ioconsultingarg.github.io/menu-qr-demo/\n\nApenas abramos te respondemos para confirmar tu pedido 🙌"
+      },
+      "id": "1a1111a1-0004-4a11-a111-000000000004",
+      "name": "Responder fuera de horario",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [900, 200],
+      "credentials": {
+        "whatsAppApi": {
+          "id": "REPLACE_ME",
+          "name": "WhatsApp Business Cloud - Don Mario"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "REPLACE_ME_PHONE_NUMBER_ID",
+        "recipientPhoneNumber": "={{$json.messages[0].from}}",
+        "textBody": "¡Hola! Gracias por escribir a Pizzería Don Mario 🍕 Ya te atiende alguien del local, danos un minuto."
+      },
+      "id": "1a1111a1-0005-4a11-a111-000000000005",
+      "name": "Avisar que ya lo atienden",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [900, 420],
+      "credentials": {
+        "whatsAppApi": {
+          "id": "REPLACE_ME",
+          "name": "WhatsApp Business Cloud - Don Mario"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "WhatsApp Trigger": {
+      "main": [[{ "node": "Calcular horario", "type": "main", "index": 0 }]]
+    },
+    "Calcular horario": {
+      "main": [[{ "node": "¿Fuera de horario?", "type": "main", "index": 0 }]]
+    },
+    "¿Fuera de horario?": {
+      "main": [
+        [{ "node": "Responder fuera de horario", "type": "main", "index": 0 }],
+        [{ "node": "Avisar que ya lo atienden", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": { "executionOrder": "v1" },
+  "staticData": null,
+  "meta": { "templateCredsSetupCompleted": false },
+  "tags": ["whatsapp", "don-mario", "demo-io-consulting"]
+}

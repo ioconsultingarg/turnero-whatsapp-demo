@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador — Automatización WhatsApp Don Mario</title>
+<meta name="description" content="Simulador de las automatizaciones de WhatsApp de Pizzería Don Mario: auto-respuesta fuera de horario y confirmación/recordatorio de turno.">
+<meta name="theme-color" content="#075e54">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="page-header">
+  <div class="container">
+    <h1>Automatización de WhatsApp — Pizzería Don Mario</h1>
+    <p class="page-subtitle">Simulación de dos flujos armados con n8n + WhatsApp Business Cloud API. Elegí un escenario para ver la conversación.</p>
+  </div>
+</header>
+
+<main class="container">
+  <div class="scenario-tabs" role="tablist">
+    <button class="scenario-tab active" data-scenario="fuera-horario">Mensaje fuera de horario</button>
+    <button class="scenario-tab" data-scenario="turno">Confirmación de turno + recordatorio</button>
+  </div>
+
+  <div class="phone-frame">
+    <div class="phone-notch"></div>
+    <div class="chat-header">
+      <div class="chat-avatar">DM</div>
+      <div>
+        <div class="chat-name">Pizzería Don Mario</div>
+        <div class="chat-status">Cuenta de WhatsApp Business</div>
+      </div>
+    </div>
+    <div class="chat-body" id="chatBody"></div>
+  </div>
+
+  <section class="explainer" id="explainer"></section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>Simulador visual · Demo desarrollado por IO Consulting</p>
+  </div>
+</footer>
+
+<script src="js/simulador.js"></script>
+</body>
+</html>
