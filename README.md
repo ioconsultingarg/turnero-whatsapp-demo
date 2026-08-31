@@ -46,6 +46,8 @@ En n8n: menú de arriba a la derecha → **Import from File** → elegir el `.js
 
 Publicado en GitHub Pages: `https://ioconsultingarg.github.io/turnero-whatsapp-demo/` — sirve para mostrarle a un prospecto cómo se ve la conversación del lado del cliente, sin necesitar credenciales reales ni una instancia de n8n prendida.
 
+![Demo del simulador: cambio entre escenario de fuera de horario y confirmación/recordatorio de turno](assets/turnero-whatsapp-simulador-demo.gif)
+
 ## Cómo adaptarlo a otro rubro
 
 Los dos flujos son genéricos: "auto-respuesta fuera de horario" sirve para cualquier PyME, y "confirmación + recordatorio" sirve igual para un turno médico, una clase, o una cancha — solo cambia el texto de los mensajes y la fuente de datos de las reservas.
