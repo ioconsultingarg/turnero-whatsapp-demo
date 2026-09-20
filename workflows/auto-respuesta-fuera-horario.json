@@ -1,5 +1,5 @@
 {
-  "name": "Auto-respuesta fuera de horario - Don Mario",
+  "name": "Auto-respuesta fuera de horario - IO Consulting",
   "nodes": [
     {
       "parameters": {
@@ -14,7 +14,7 @@
       "credentials": {
         "whatsAppTriggerApi": {
           "id": "REPLACE_ME",
-          "name": "WhatsApp Business Cloud - Don Mario"
+          "name": "WhatsApp Business Cloud - IO Consulting"
         }
       }
     },
@@ -54,7 +54,7 @@
         "operation": "send",
         "phoneNumberId": "REPLACE_ME_PHONE_NUMBER_ID",
         "recipientPhoneNumber": "={{$json.messages[0].from}}",
-        "textBody": "¡Hola! Gracias por escribir a Pizzería Don Mario 🍕\n\nEn este momento estamos cerrados. Nuestro horario es martes a domingos de 19 a 00hs (viernes y sábados hasta la 1am).\n\nTe dejamos el menú para que vayas eligiendo: https://ioconsultingarg.github.io/menu-qr-demo/\n\nApenas abramos te respondemos para confirmar tu pedido 🙌"
+        "textBody": "¡Hola! Gracias por escribir a Pizzería IO Consulting 🍕\n\nEn este momento estamos cerrados. Nuestro horario es martes a domingos de 19 a 00hs (viernes y sábados hasta la 1am).\n\nTe dejamos el menú para que vayas eligiendo: https://ioconsultingarg.github.io/menu-qr-demo/\n\nApenas abramos te respondemos para confirmar tu pedido 🙌"
       },
       "id": "1a1111a1-0004-4a11-a111-000000000004",
       "name": "Responder fuera de horario",
@@ -64,7 +64,7 @@
       "credentials": {
         "whatsAppApi": {
           "id": "REPLACE_ME",
-          "name": "WhatsApp Business Cloud - Don Mario"
+          "name": "WhatsApp Business Cloud - IO Consulting"
         }
       }
     },
@@ -73,7 +73,7 @@
         "operation": "send",
         "phoneNumberId": "REPLACE_ME_PHONE_NUMBER_ID",
         "recipientPhoneNumber": "={{$json.messages[0].from}}",
-        "textBody": "¡Hola! Gracias por escribir a Pizzería Don Mario 🍕 Ya te atiende alguien del local, danos un minuto."
+        "textBody": "¡Hola! Gracias por escribir a Pizzería IO Consulting 🍕 Ya te atiende alguien del local, danos un minuto."
       },
       "id": "1a1111a1-0005-4a11-a111-000000000005",
       "name": "Avisar que ya lo atienden",
@@ -83,7 +83,7 @@
       "credentials": {
         "whatsAppApi": {
           "id": "REPLACE_ME",
-          "name": "WhatsApp Business Cloud - Don Mario"
+          "name": "WhatsApp Business Cloud - IO Consulting"
         }
       }
     }

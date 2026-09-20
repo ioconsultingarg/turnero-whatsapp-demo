@@ -1,6 +1,6 @@
 # turnero-whatsapp-demo
 
-Automatización de WhatsApp para Pizzería Don Mario (mismo cliente ficticio que `landing-comercio-demo` y `menu-qr-demo`), demo de portfolio de **IO Consulting**. A diferencia de los otros dos demos, esto no es un sitio autocontenido — son workflows de **n8n** que se conectan a la **WhatsApp Business Cloud API** de Meta.
+Automatización de WhatsApp para Pizzería IO Consulting (mismo cliente ficticio que `landing-comercio-demo` y `menu-qr-demo`), demo de portfolio de **IO Consulting**. A diferencia de los otros dos demos, esto no es un sitio autocontenido — son workflows de **n8n** que se conectan a la **WhatsApp Business Cloud API** de Meta.
 
 ## Problema que resuelve
 

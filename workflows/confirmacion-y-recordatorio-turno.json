@@ -1,5 +1,5 @@
 {
-  "name": "Confirmacion y recordatorio de turno - Don Mario",
+  "name": "Confirmacion y recordatorio de turno - IO Consulting",
   "nodes": [
     {
       "parameters": {
@@ -21,7 +21,7 @@
         "operation": "send",
         "phoneNumberId": "REPLACE_ME_PHONE_NUMBER_ID",
         "recipientPhoneNumber": "={{$json.telefono}}",
-        "textBody": "¡Hola {{$json.nombre}}! Confirmamos tu reserva en Pizzería Don Mario 🍕\n\n📅 {{$json.fecha}} a las {{$json.hora}}\n👥 {{$json.personas}} personas\n\nSi necesitás cambiar el horario, respondé este mensaje. ¡Te esperamos!"
+        "textBody": "¡Hola {{$json.nombre}}! Confirmamos tu reserva en Pizzería IO Consulting 🍕\n\n📅 {{$json.fecha}} a las {{$json.hora}}\n👥 {{$json.personas}} personas\n\nSi necesitás cambiar el horario, respondé este mensaje. ¡Te esperamos!"
       },
       "id": "2b2222b2-0002-4b22-b222-000000000002",
       "name": "Enviar confirmacion",
@@ -31,7 +31,7 @@
       "credentials": {
         "whatsAppApi": {
           "id": "REPLACE_ME",
-          "name": "WhatsApp Business Cloud - Don Mario"
+          "name": "WhatsApp Business Cloud - IO Consulting"
         }
       }
     },
@@ -63,7 +63,7 @@
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "REPLACE_ME",
-          "name": "Google Sheets - Don Mario"
+          "name": "Google Sheets - IO Consulting"
         }
       },
       "notes": "Reemplazar por la fuente real de reservas (Sheets, Supabase, etc). Debe traer nombre, telefono, fecha y hora de cada reserva."
@@ -83,7 +83,7 @@
         "operation": "send",
         "phoneNumberId": "REPLACE_ME_PHONE_NUMBER_ID",
         "recipientPhoneNumber": "={{$json.telefono}}",
-        "textBody": "¡Hola {{$json.nombre}}! Te recordamos tu reserva mañana {{$json.fecha}} a las {{$json.hora}} en Pizzería Don Mario 🍕\n\nSi no podés venir, respondé este mensaje para cancelar o reprogramar. ¡Te esperamos!"
+        "textBody": "¡Hola {{$json.nombre}}! Te recordamos tu reserva mañana {{$json.fecha}} a las {{$json.hora}} en Pizzería IO Consulting 🍕\n\nSi no podés venir, respondé este mensaje para cancelar o reprogramar. ¡Te esperamos!"
       },
       "id": "2b2222b2-0006-4b22-b222-000000000006",
       "name": "Enviar recordatorio",
@@ -93,7 +93,7 @@
       "credentials": {
         "whatsAppApi": {
           "id": "REPLACE_ME",
-          "name": "WhatsApp Business Cloud - Don Mario"
+          "name": "WhatsApp Business Cloud - IO Consulting"
         }
       }
     }

@@ -6,7 +6,7 @@ var ESCENARIOS = {
     },
     mensajes: [
       { tipo: 'in', texto: 'Hola! quiero pedir 2 muzzarellas para las 21', hora: '02:14' },
-      { tipo: 'out', tag: 'Automático', texto: '¡Hola! Gracias por escribir a Pizzería Don Mario 🍕\n\nEn este momento estamos cerrados. Nuestro horario es martes a domingos de 19 a 00hs (viernes y sábados hasta la 1am).\n\nTe dejamos el menú para que vayas eligiendo: ioconsultingarg.github.io/menu-qr-demo\n\nApenas abramos te respondemos para confirmar tu pedido 🙌', hora: '02:14' }
+      { tipo: 'out', tag: 'Automático', texto: '¡Hola! Gracias por escribir a Pizzería IO Consulting 🍕\n\nEn este momento estamos cerrados. Nuestro horario es martes a domingos de 19 a 00hs (viernes y sábados hasta la 1am).\n\nTe dejamos el menú para que vayas eligiendo: ioconsultingarg.github.io/menu-qr-demo\n\nApenas abramos te respondemos para confirmar tu pedido 🙌', hora: '02:14' }
     ]
   },
   'turno': {
@@ -15,8 +15,8 @@ var ESCENARIOS = {
       texto: 'Al agendar una mesa, un webhook dispara la confirmación inmediata (workflows/confirmacion-y-recordatorio-turno.json). Un segundo disparador programado revisa cada hora las reservas próximas y manda el recordatorio 24hs antes, para bajar el ausentismo.'
     },
     mensajes: [
-      { tipo: 'out', tag: 'Automático · al agendar', texto: '¡Hola Marina! Confirmamos tu reserva en Pizzería Don Mario 🍕\n\n📅 Viernes 4/9 a las 21:00\n👥 4 personas\n\nSi necesitás cambiar el horario, respondé este mensaje. ¡Te esperamos!', hora: 'Mar 18:30' },
-      { tipo: 'out', tag: 'Automático · 24hs antes', texto: '¡Hola Marina! Te recordamos tu reserva mañana Viernes 4/9 a las 21:00 en Pizzería Don Mario 🍕\n\nSi no podés venir, respondé este mensaje para cancelar o reprogramar. ¡Te esperamos!', hora: 'Jue 21:00' },
+      { tipo: 'out', tag: 'Automático · al agendar', texto: '¡Hola Marina! Confirmamos tu reserva en Pizzería IO Consulting 🍕\n\n📅 Viernes 4/9 a las 21:00\n👥 4 personas\n\nSi necesitás cambiar el horario, respondé este mensaje. ¡Te esperamos!', hora: 'Mar 18:30' },
+      { tipo: 'out', tag: 'Automático · 24hs antes', texto: '¡Hola Marina! Te recordamos tu reserva mañana Viernes 4/9 a las 21:00 en Pizzería IO Consulting 🍕\n\nSi no podés venir, respondé este mensaje para cancelar o reprogramar. ¡Te esperamos!', hora: 'Jue 21:00' },
       { tipo: 'in', texto: 'Perfecto, ahí estamos!', hora: 'Jue 21:04' }
     ]
   }
