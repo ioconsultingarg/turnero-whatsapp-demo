@@ -4,7 +4,7 @@
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "nuevo-turno-donmario",
+        "path": "nuevo-turno-io-consulting",
         "responseMode": "onReceived",
         "options": {}
       },
@@ -13,7 +13,7 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [240, 220],
-      "webhookId": "nuevo-turno-donmario",
+      "webhookId": "nuevo-turno-io-consulting",
       "notes": "Se dispara desde el sistema de turnos (o una planilla de Sheets) cuando se agenda una reserva nueva. Espera JSON: { nombre, telefono, fecha, hora, personas }"
     },
     {
@@ -116,5 +116,5 @@
   "settings": { "executionOrder": "v1" },
   "staticData": null,
   "meta": { "templateCredsSetupCompleted": false },
-  "tags": ["whatsapp", "don-mario", "demo-io-consulting"]
+  "tags": ["whatsapp", "io-consulting", "demo-io-consulting"]
 }
