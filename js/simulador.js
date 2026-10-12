@@ -26,8 +26,12 @@ document.addEventListener('DOMContentLoaded', function () {
   var tabs = document.querySelectorAll('.scenario-tab');
   tabs.forEach(function (tab) {
     tab.addEventListener('click', function () {
-      tabs.forEach(function (t) { t.classList.remove('active'); });
+      tabs.forEach(function (t) {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
       tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
       renderScenario(tab.dataset.scenario);
     });
   });
@@ -44,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function () {
         bubble.className = 'bubble ' + msg.tipo;
         bubble.innerHTML =
           (msg.tag ? '<span class="bubble-tag">' + msg.tag + '</span><br>' : '') +
-          escapeHtml(msg.texto) +
+          linkify(escapeHtml(msg.texto)) +
           '<span class="bubble-time">' + msg.hora + '</span>';
         chatBody.appendChild(bubble);
         chatBody.scrollTop = chatBody.scrollHeight;
@@ -53,6 +57,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var explainer = document.getElementById('explainer');
     explainer.innerHTML = '<h2>' + data.explicacion.titulo + '</h2><p>' + data.explicacion.texto + '</p>';
+  }
+
+  function linkify(html) {
+    return html.replace(/\bioconsultingarg\.github\.io\/[\w\-\/]+/g, function (url) {
+      return '<a href="https://' + url + '/" target="_blank" rel="noopener">' + url + '</a>';
+    });
   }
 
   function escapeHtml(str) {
