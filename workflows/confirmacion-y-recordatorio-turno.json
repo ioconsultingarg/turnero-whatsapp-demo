@@ -5,6 +5,7 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "nuevo-turno-io-consulting",
+        "authentication": "headerAuth",
         "responseMode": "onReceived",
         "options": {}
       },
@@ -14,26 +15,70 @@
       "typeVersion": 2,
       "position": [240, 220],
       "webhookId": "nuevo-turno-io-consulting",
-      "notes": "Se dispara desde el sistema de turnos (o una planilla de Sheets) cuando se agenda una reserva nueva. Espera JSON: { nombre, telefono, fecha, hora, personas }"
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_ME",
+          "name": "Webhook turnos - secreto compartido"
+        }
+      },
+      "notes": "Se dispara desde el sistema de turnos cuando se agenda una reserva nueva. Exige un header secreto (credencial Header Auth): sin él responde 403. Espera JSON: { nombre, telefono, fecha, hora, personas }, con telefono en formato internacional sin '+' (ej. 5491122334455)."
     },
     {
       "parameters": {
-        "operation": "send",
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            {
+              "id": "cond-telefono-valido",
+              "leftValue": "={{ String($json.body.telefono ?? '') }}",
+              "rightValue": "^549\\d{10}$",
+              "operator": { "type": "string", "operation": "regex" }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "2b2222b2-0007-4b22-b222-000000000007",
+      "name": "¿Teléfono válido?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [460, 220],
+      "notes": "Solo deja pasar celulares argentinos (549 + 10 dígitos). Lo que no cumple se descarta sin enviar nada."
+    },
+    {
+      "parameters": {
+        "operation": "sendTemplate",
         "phoneNumberId": "REPLACE_ME_PHONE_NUMBER_ID",
-        "recipientPhoneNumber": "={{$json.telefono}}",
-        "textBody": "¡Hola {{$json.nombre}}! Confirmamos tu reserva en Pizzería IO Consulting 🍕\n\n📅 {{$json.fecha}} a las {{$json.hora}}\n👥 {{$json.personas}} personas\n\nSi necesitás cambiar el horario, respondé este mensaje. ¡Te esperamos!"
+        "recipientPhoneNumber": "={{$json.body.telefono}}",
+        "template": "confirmacion_reserva|es_AR",
+        "components": {
+          "component": [
+            {
+              "type": "body",
+              "bodyParameters": {
+                "parameter": [
+                  { "type": "text", "text": "={{$json.body.nombre}}" },
+                  { "type": "text", "text": "={{$json.body.fecha}}" },
+                  { "type": "text", "text": "={{$json.body.hora}}" },
+                  { "type": "text", "text": "={{$json.body.personas}}" }
+                ]
+              }
+            }
+          ]
+        }
       },
       "id": "2b2222b2-0002-4b22-b222-000000000002",
       "name": "Enviar confirmacion",
       "type": "n8n-nodes-base.whatsApp",
       "typeVersion": 1,
-      "position": [480, 220],
+      "position": [680, 200],
       "credentials": {
         "whatsAppApi": {
           "id": "REPLACE_ME",
           "name": "WhatsApp Business Cloud - IO Consulting"
         }
-      }
+      },
+      "notes": "Mensaje iniciado por el negocio: Meta exige una plantilla aprobada. Plantilla 'confirmacion_reserva' (es_AR, categoría Utilidad): ¡Hola {{1}}! Confirmamos tu reserva en Pizzería IO Consulting 🍕 / 📅 {{2}} a las {{3}} / 👥 {{4}} personas / Si necesitás cambiar el horario, respondé este mensaje. ¡Te esperamos!"
     },
     {
       "parameters": {
@@ -66,11 +111,11 @@
           "name": "Google Sheets - IO Consulting"
         }
       },
-      "notes": "Reemplazar por la fuente real de reservas (Sheets, Supabase, etc). Debe traer nombre, telefono, fecha y hora de cada reserva."
+      "notes": "Reemplazar por la fuente real de reservas (Sheets, Supabase, etc). Columnas: nombre, telefono, fecha (AAAA-MM-DD), hora (HH:MM) y recordatorioEnviado."
     },
     {
       "parameters": {
-        "jsCode": "const ahora = new Date();\nconst en24hs = new Date(ahora.getTime() + 24*60*60*1000);\nreturn items.filter(item => {\n  const fechaTurno = new Date(item.json.fecha + 'T' + item.json.hora);\n  const diffMin = Math.abs(fechaTurno.getTime() - en24hs.getTime()) / 60000;\n  return diffMin <= 30 && !item.json.recordatorioEnviado;\n});"
+        "jsCode": "const ahora = new Date();\nconst en24hs = new Date(ahora.getTime() + 24*60*60*1000);\nreturn $input.all().filter(item => {\n  // fecha AAAA-MM-DD y hora HH:MM, siempre en hora de Argentina (UTC-3)\n  const fechaTurno = new Date(item.json.fecha + 'T' + item.json.hora + ':00-03:00');\n  if (isNaN(fechaTurno.getTime())) return false;\n  const diffMin = Math.abs(fechaTurno.getTime() - en24hs.getTime()) / 60000;\n  return diffMin <= 30 && !item.json.recordatorioEnviado;\n});"
       },
       "id": "2b2222b2-0005-4b22-b222-000000000005",
       "name": "Filtrar reservas a 24hs",
@@ -80,10 +125,24 @@
     },
     {
       "parameters": {
-        "operation": "send",
+        "operation": "sendTemplate",
         "phoneNumberId": "REPLACE_ME_PHONE_NUMBER_ID",
         "recipientPhoneNumber": "={{$json.telefono}}",
-        "textBody": "¡Hola {{$json.nombre}}! Te recordamos tu reserva mañana {{$json.fecha}} a las {{$json.hora}} en Pizzería IO Consulting 🍕\n\nSi no podés venir, respondé este mensaje para cancelar o reprogramar. ¡Te esperamos!"
+        "template": "recordatorio_reserva|es_AR",
+        "components": {
+          "component": [
+            {
+              "type": "body",
+              "bodyParameters": {
+                "parameter": [
+                  { "type": "text", "text": "={{$json.nombre}}" },
+                  { "type": "text", "text": "={{$json.fecha}}" },
+                  { "type": "text", "text": "={{$json.hora}}" }
+                ]
+              }
+            }
+          ]
+        }
       },
       "id": "2b2222b2-0006-4b22-b222-000000000006",
       "name": "Enviar recordatorio",
@@ -95,12 +154,48 @@
           "id": "REPLACE_ME",
           "name": "WhatsApp Business Cloud - IO Consulting"
         }
-      }
+      },
+      "notes": "Plantilla 'recordatorio_reserva' (es_AR, categoría Utilidad): ¡Hola {{1}}! Te recordamos tu reserva mañana {{2}} a las {{3}} en Pizzería IO Consulting 🍕 / Si no podés venir, respondé este mensaje para cancelar o reprogramar. ¡Te esperamos!"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": { "mode": "id", "value": "REPLACE_ME_GOOGLE_SHEET_ID" },
+        "sheetName": { "mode": "name", "value": "Reservas" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Filtrar reservas a 24hs').item.json.row_number }}",
+            "recordatorioEnviado": "SI"
+          },
+          "matchingColumns": ["row_number"],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "2b2222b2-0008-4b22-b222-000000000008",
+      "name": "Marcar recordatorio enviado",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [1120, 460],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_ME",
+          "name": "Google Sheets - IO Consulting"
+        }
+      },
+      "notes": "Escribe 'SI' en la columna recordatorioEnviado de la fila ya avisada, para que la próxima corrida no la repita."
     }
   ],
   "connections": {
     "Nuevo turno (Webhook)": {
-      "main": [[{ "node": "Enviar confirmacion", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "¿Teléfono válido?", "type": "main", "index": 0 }]]
+    },
+    "¿Teléfono válido?": {
+      "main": [
+        [{ "node": "Enviar confirmacion", "type": "main", "index": 0 }],
+        []
+      ]
     },
     "Chequeo cada hora": {
       "main": [[{ "node": "Leer reservas (Sheets)", "type": "main", "index": 0 }]]
@@ -110,6 +205,9 @@
     },
     "Filtrar reservas a 24hs": {
       "main": [[{ "node": "Enviar recordatorio", "type": "main", "index": 0 }]]
+    },
+    "Enviar recordatorio": {
+      "main": [[{ "node": "Marcar recordatorio enviado", "type": "main", "index": 0 }]]
     }
   },
   "pinData": {},
