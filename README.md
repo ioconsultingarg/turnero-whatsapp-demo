@@ -22,14 +22,18 @@ El dueño (o quien atienda el WhatsApp del local) pierde pedidos cuando el negoc
 - `workflows/auto-respuesta-fuera-horario.json` — responde automáticamente fuera del horario de atención, con el link al menú
 - `workflows/confirmacion-y-recordatorio-turno.json` — confirma la reserva al agendarse y manda un recordatorio 24hs antes
 
-**Importante:** los archivos `.json` son plantillas de referencia escritas a mano siguiendo el formato de exportación de n8n — no fueron probadas contra una instancia real. Es muy probable que al importarlas haga falta ajustar algún parámetro o el `typeVersion` de algún nodo según la versión de n8n que uses. Si el import da problemas, más abajo está la receta para armar cada flujo a mano en un par de minutos.
+**Importante:** los archivos `.json` son plantillas de referencia en el formato de exportación de n8n. Según la versión de n8n que uses, al importarlas puede hacer falta ajustar algún parámetro o el `typeVersion` de algún nodo; probalas siempre con el número de prueba de Meta antes de usarlas con clientes. Si el import da problemas, más abajo está la receta para armar cada flujo a mano en un par de minutos.
 
 ## Requisitos para correrlo de verdad
 
-1. Una instancia de n8n corriendo (podés reusar la que ya tenés en el demo lab de IO Consulting)
+1. Una instancia de n8n corriendo (self-hosted o n8n Cloud)
 2. Una app en [Meta for Developers](https://developers.facebook.com/) con el producto **WhatsApp Business Platform** activado, y un número de prueba (Meta te da uno gratis para testear)
 3. En n8n, credencial de tipo **WhatsApp Business Cloud** con el access token y el phone number ID de esa app
-4. Para el flujo de recordatorio: una fuente de datos con las reservas (Google Sheets, Supabase, o el mismo sistema de turnos del portfolio) — el JSON asume una hoja de Sheets llamada "Reservas" con columnas `nombre`, `telefono`, `fecha`, `hora`
+4. Dos **plantillas de mensaje aprobadas** en Meta (categoría Utilidad, idioma `es_AR`). La confirmación y el recordatorio los inicia el negocio, y WhatsApp solo permite texto libre dentro de las 24hs posteriores al último mensaje del cliente:
+   - `confirmacion_reserva`: "¡Hola {{1}}! Confirmamos tu reserva en Pizzería IO Consulting 🍕 📅 {{2}} a las {{3}} 👥 {{4}} personas. Si necesitás cambiar el horario, respondé este mensaje. ¡Te esperamos!"
+   - `recordatorio_reserva`: "¡Hola {{1}}! Te recordamos tu reserva mañana {{2}} a las {{3}} en Pizzería IO Consulting 🍕 Si no podés venir, respondé este mensaje para cancelar o reprogramar. ¡Te esperamos!"
+5. Para el flujo de recordatorio: una fuente de datos con las reservas (Google Sheets, Supabase, o el mismo sistema de turnos del portfolio) — el JSON asume una hoja de Sheets llamada "Reservas" con columnas `nombre`, `telefono` (formato `5491122334455`), `fecha` (`AAAA-MM-DD`), `hora` (`HH:MM`) y `recordatorioEnviado` (la completa el flujo)
+6. Consentimiento de cada cliente para recibir mensajes por WhatsApp (lo exige Meta) y un aviso de privacidad sobre el uso de su nombre y teléfono (Ley 25.326)
 
 ## Cómo importar los workflows
 
@@ -37,20 +41,21 @@ En n8n: menú de arriba a la derecha → **Import from File** → elegir el `.js
 
 1. Abrir cada nodo de WhatsApp y asignar tu credencial real (donde dice `REPLACE_ME`)
 2. Completar `REPLACE_ME_PHONE_NUMBER_ID` con el ID de tu número de WhatsApp Business
-3. En el flujo de recordatorio, completar `REPLACE_ME_GOOGLE_SHEET_ID` y la credencial de Google Sheets
-4. Activar el workflow (toggle arriba a la derecha)
+3. En el flujo de recordatorio, completar `REPLACE_ME_GOOGLE_SHEET_ID` (aparece en dos nodos) y la credencial de Google Sheets
+4. En el nodo **Nuevo turno (Webhook)**, crear una credencial **Header Auth** con un nombre de header y un valor secreto largo y aleatorio. El sistema de turnos tiene que mandar ese header en cada llamada; sin él, el webhook responde 403
+5. Activar el workflow (toggle arriba a la derecha)
 
 ## Receta manual (si el import falla)
 
 **Auto-respuesta fuera de horario:**
 1. Nodo trigger: **WhatsApp Trigger** (evento "messages")
-2. Nodo **Code**: calcula si la hora actual está fuera del horario de atención
+2. Nodo **Code**: descarta los eventos que no son mensajes entrantes, evita responderle dos veces seguidas al mismo contacto y calcula si la hora actual está fuera del horario de atención
 3. Nodo **IF**: si está fuera de horario, sigue por una rama; si no, por otra
 4. Cada rama termina en un nodo **WhatsApp → Send Message** con el texto correspondiente
 
 **Confirmación y recordatorio:**
-1. Un **Webhook** que recibe la reserva nueva (desde el sistema de turnos) → nodo **WhatsApp → Send Message** con la confirmación
-2. Por separado, un **Schedule Trigger** cada 1 hora → nodo **Google Sheets (Read)** con las reservas → nodo **Code** que filtra las que están a ~24hs → nodo **WhatsApp → Send Message** con el recordatorio
+1. Un **Webhook** con autenticación Header Auth que recibe la reserva nueva (desde el sistema de turnos) → nodo **IF** que valida el teléfono → nodo **WhatsApp → Send Template** con la confirmación
+2. Por separado, un **Schedule Trigger** cada 1 hora → nodo **Google Sheets (Read)** con las reservas → nodo **Code** que filtra las que están a ~24hs → nodo **WhatsApp → Send Template** con el recordatorio → nodo **Google Sheets (Update)** que marca `recordatorioEnviado`
 
 ## Ver el simulador
 
@@ -67,6 +72,8 @@ Los dos flujos son genéricos: "auto-respuesta fuera de horario" sirve para cual
 ```
 turnero-whatsapp-demo/
 ├── index.html              (simulador visual)
+├── 404.html
+├── assets/                 (favicon, imagen para compartir, GIF del README)
 ├── css/styles.css
 ├── js/simulador.js
 ├── workflows/
